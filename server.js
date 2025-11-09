@@ -9,7 +9,7 @@ connectDB()
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin:["https://cdinventory.netlify.app/","http://localhost:5173"],methods: ["GET", "POST", "PUT", "DELETE"],
+    origin:["https://cdinventory.netlify.app","http://localhost:5173"],methods: ["GET", "POST", "PUT", "DELETE"],
      credentials: true
 }))
 app.use('/',router)
