@@ -18,9 +18,23 @@ const fabricController={
 
     },
 
-    Outward:async(req,res)=>{
+    Selection:async(req,res)=>{
         try {
-            const{FABRIC_GROUP,COLOR_NAME,ROLL,WGT}=req.body
+            const{FABRIC_GROUP,COLOR_NAME}=req.body
+            let fabricBalance=await FabricBalance.findOne({FABRIC_GROUP,COLOR_NAME})
+            .select('DOC_NO FABRIC_GROUP COLOR_NAME SET_NO DC_DIA RECD_DC_ROLL RECD_DC_WGT _id');
+                console.log(fabricBalance)
+                res.status(200).send(fabricBalance)
+
+        } catch (error) {
+               console.error("Error in Outward:", error);
+               res.status(500).send({ message: "Server error", error });
+        }
+    },
+
+        Outward:async(req,res)=>{
+        try {
+            const{ROLL,WGT}=req.body
             let fabricBalance=await FabricBalance.findOne({FABRIC_GROUP,COLOR_NAME})
             .select('DOC_NO FABRIC_GROUP COLOR_NAME SET_NO DC_DIA RECD_DC_ROLL RECD_DC_WGT _id');
                fabricBalance.RECD_DC_ROLL = Number(fabricBalance.RECD_DC_ROLL) - Number(ROLL);
