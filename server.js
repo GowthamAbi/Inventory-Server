@@ -15,5 +15,5 @@ app.use(cors({
 app.use('/',router)
 app.use('/inventory',fabric)
 app.listen(3000,()=>{
-    console.log("Server is on 3000")
+    console.log("http://localhost:3000")
 })
