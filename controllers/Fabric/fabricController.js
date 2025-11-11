@@ -21,7 +21,9 @@ const fabricController={
     Selection:async(req,res)=>{
         try {
             const{FABRIC_GROUP,COLOR_NAME}=req.body
-            const fabricBalance=await FabricBalance.find({FABRIC_GROUP,COLOR_NAME})
+            console.log(FABRIC_GROUP,COLOR_NAME)
+            const fabricBalance=await Fabric.find({FABRIC_GROUP,COLOR_NAME})
+            console.log(fabricBalance)
                     if (!fabricBalance.length) {
                 return res.status(404).json({ message: "No matching data found" });
                 }
