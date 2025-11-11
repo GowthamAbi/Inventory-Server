@@ -21,10 +21,12 @@ const fabricController={
     Selection:async(req,res)=>{
         try {
             const{FABRIC_GROUP,COLOR_NAME}=req.body
-            let fabricBalance=await FabricBalance.findOne({FABRIC_GROUP,COLOR_NAME})
-            .select('DOC_NO FABRIC_GROUP COLOR_NAME SET_NO DC_DIA RECD_DC_ROLL RECD_DC_WGT _id');
+            const fabricBalance=await FabricBalance.find({FABRIC_GROUP,COLOR_NAME})
+                    if (!fabricBalance.length) {
+                return res.status(404).json({ message: "No matching data found" });
+                }
                 console.log(fabricBalance)
-                res.status(200).send(fabricBalance)
+                res.status(200).json(fabricBalance)
 
         } catch (error) {
                console.error("Error in Outward:", error);
