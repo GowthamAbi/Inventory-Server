@@ -5,6 +5,7 @@ const fabric=express.Router()
 
 fabric.post('/inward',fabricController.Inward)
 fabric.post('/selection',fabricController.Selection)
+fabric.post('/outward',fabricController.Outward)
 
 
 export default fabric

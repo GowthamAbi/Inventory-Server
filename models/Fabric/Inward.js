@@ -6,11 +6,10 @@ const fabricSchema=new mongoose.Schema({
             required:true,
             trim:true
     },
-    DATE:{
-            type:String,
-            required:true,
-            trim:true
-    },
+    DATE: {
+  type: Date,
+  default: Date.now,   
+},
     JOB_ORDER_NO:{
             type:String,
             required:true,

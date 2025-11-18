@@ -1,5 +1,6 @@
 import Fabric from "../../models/Fabric/Inward.js"
 import FabricBalance from "../../models/Fabric/Balance.js"
+import FabricOutward from "../../models/Fabric/Outward.js"
 
 const fabricController={
     Inward:async(req,res)=>{
@@ -27,7 +28,7 @@ const fabricController={
                     if (!fabricBalance.length) {
                 return res.status(404).json({ message: "No matching data found" });
                 }
-                console.log(fabricBalance)
+                
                 res.status(200).json(fabricBalance)
 
         } catch (error) {
@@ -36,21 +37,25 @@ const fabricController={
         }
     },
 
-        Outward:async(req,res)=>{
-        try {
-            const{ROLL,WGT}=req.body
-            let fabricBalance=await FabricBalance.findOne({FABRIC_GROUP,COLOR_NAME})
-            .select('DOC_NO FABRIC_GROUP COLOR_NAME SET_NO DC_DIA RECD_DC_ROLL RECD_DC_WGT _id');
-               fabricBalance.RECD_DC_ROLL = Number(fabricBalance.RECD_DC_ROLL) - Number(ROLL);
-               fabricBalance.RECD_DC_WGT = Number(fabricBalance.RECD_DC_WGT) - Number(WGT);
-                await fabricBalance.save();
-                res.status(200).send(fabricBalance)
+        Outward: async (req, res) => {
+  try {
+    const { items } = req.body;  // <-- array of outward rows
 
-        } catch (error) {
-               console.error("Error in Outward:", error);
-               res.status(500).send({ message: "Server error", error });
-        }
-    },
+    if (!Array.isArray(items)) {
+      return res.status(400).json({ message: "items must be an array" });
+    }
+
+    const savedDocs = await FabricOutward.insertMany(items);
+
+    console.log("Inserted outward rows:", savedDocs);
+
+    res.status(200).json(savedDocs);
+  } catch (error) {
+    console.error("Error in Outward:", error);
+    res.status(500).json({ message: "Server error", error });
+  }
+},
+
 
     Balance:async(req,res)=>{
         try {
