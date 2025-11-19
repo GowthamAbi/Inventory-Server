@@ -7,7 +7,9 @@ fabric.post('/inward',fabricController.Inward)
 fabric.get('/list',fabricController.List)
 fabric.post('/selection',fabricController.Selection)
 fabric.post('/outward',fabricController.Outward)
-fabric.get('/outward',fabricController.Cutting)
+fabric.post('/outward',fabricController.Cutting)
+fabric.post('/print/1',fabricController.Fabric)
+fabric.post('/print/2',fabricController.CuttingList)
 
 
 export default fabric

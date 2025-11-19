@@ -14,8 +14,11 @@ const fabricOutSchema = new mongoose.Schema({
   ITEM_CODE: { type: String,  trim: true },
   ITEM_NAME: { type: String,  trim: true },
   STYLE: { type: String,  trim: true },
-  SET_NO: { type: String,  trim: true },
-  SIZE: { type: String,  trim: true },
+   SIZE: {
+    first_size: { type: String },
+    first_size_pcs_wt: { type: String },
+    first_size_fab_wt: { type: String }
+  ,},
   DATE: {
   type: Date,
   default: Date.now,   

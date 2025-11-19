@@ -89,6 +89,33 @@ Outward: async (req, res) => {
         } catch (error) {
             console.log("Error in List",error)
         }
+    },
+Fabric: async (req, res) => {
+  try {
+    const { DOC_NO } = req.body;     // Read DOC_NO from request body
+
+    console.log("Incoming DOC_NO:", DOC_NO);
+
+    // Query DB: find any documents where DOC_NO matches
+    const fabricData = await Fabric.find({ DOC_NO: DOC_NO });
+
+    res.status(200).json(fabricData);
+
+  } catch (error) {
+    console.log("Error in List", error);
+    res.status(500).json({ message: "Server error" });
+  }
+},
+
+    CuttingList:async(req,res)=>{
+        try {
+            const{DOC_NO}=req.body
+            const fabricData=await FabricOutward.find({ DOC_NO: DOC_NO })
+            res.status(200).json(fabricData)
+            console.log("FabricOutward Data",fabricData)
+        } catch (error) {
+            console.log("Error in List",error)
+        }
     }
 }
 
