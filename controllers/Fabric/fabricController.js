@@ -14,7 +14,7 @@ const fabricController={
                 fabric.save().then(res.status(200).send("Data is Saved"))
                 console.log({fabric})
         } catch (error) {
-            console.log("inward error")
+            console.log("inward error",error)
         }
 
     },
@@ -36,16 +36,18 @@ const fabricController={
                res.status(500).send({ message: "Server error", error });
         }
     },
-
-        Outward: async (req, res) => {
+Outward: async (req, res) => {
   try {
-    const { items } = req.body;  // <-- array of outward rows
+    const { items } = req.body;
 
     if (!Array.isArray(items)) {
       return res.status(400).json({ message: "items must be an array" });
     }
 
-    const savedDocs = await FabricOutward.insertMany(items);
+    // Remove _id from each item
+    const cleanedItems = items.map(({ _id, ...rest }) => rest);
+
+    const savedDocs = await FabricOutward.insertMany(cleanedItems);
 
     console.log("Inserted outward rows:", savedDocs);
 
@@ -55,8 +57,6 @@ const fabricController={
     res.status(500).json({ message: "Server error", error });
   }
 },
-
-
     Balance:async(req,res)=>{
         try {
             
@@ -70,6 +70,24 @@ const fabricController={
         } catch (error) {
                console.error("Error in Balance:", error);
                res.status(500).send({ message: "Server error", error });
+        }
+    },
+    List:async(req,res)=>{
+        try {
+            const fabricData=await Fabric.find()
+            res.status(200).json(fabricData)
+            console.log("Fabric Data",fabricData)
+        } catch (error) {
+            console.log("Error in List",error)
+        }
+    },
+    Cutting:async(req,res)=>{
+        try {
+            const fabricData=await FabricOutward.find()
+            res.status(200).json(fabricData)
+            console.log("FabricOutward Data",fabricData)
+        } catch (error) {
+            console.log("Error in List",error)
         }
     }
 }
