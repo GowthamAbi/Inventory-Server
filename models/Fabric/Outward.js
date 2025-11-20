@@ -1,7 +1,21 @@
 import mongoose from "mongoose";
 
 const fabricOutSchema = new mongoose.Schema({
-  DOC_NO: { type: String,  trim: true },
+  DOC_NO: {   
+  first_dcno: { type: String, trim: true },
+  second_dcno: { type: String, trim: true },
+  third_dcno: { type: String, trim: true },
+  fourth_dcno: { type: String, trim: true },
+  fifth_dcno: { type: String, trim: true },
+  sixth_dcno: { type: String, trim: true },
+  seventh_dcno: { type: String, trim: true },
+  eighth_dcno: { type: String, trim: true },
+  ninth_dcno: { type: String, trim: true },
+  tenth_dcno: { type: String, trim: true },
+  eleventh_dcno: { type: String, trim: true },
+  twelfth_dcno: { type: String, trim: true },
+  thirteenth_dcno: { type: String, trim: true }
+ },
   DATE: { type: Date,  trim: true },
   FABRIC_GROUP: { type: String,  trim: true },
   COLOR_NAME: {
