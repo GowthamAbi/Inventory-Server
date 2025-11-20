@@ -13,12 +13,57 @@ const fabricOutSchema = new mongoose.Schema({
   WGT: { type: String,  trim: true },
   ITEM_CODE: { type: String,  trim: true },
   ITEM_NAME: { type: String,  trim: true },
+  ORDER_NO: { type: Number,  default:0 },
   STYLE: { type: String,  trim: true },
    SIZE: {
-    first_size: { type: String },
-    first_size_pcs_wt: { type: String },
-    first_size_fab_wt: { type: String }
-  ,},
+  first_size: { type: String },
+  first_size_pcs_wt: { type: String },
+  first_size_fab_wt: { type: String },
+
+  second_size: { type: String },
+  second_size_pcs_wt: { type: String },
+  second_size_fab_wt: { type: String },
+
+  third_size: { type: String },
+  third_size_pcs_wt: { type: String },
+  third_size_fab_wt: { type: String },
+
+  fourth_size: { type: String },
+  fourth_size_pcs_wt: { type: String },
+  fourth_size_fab_wt: { type: String },
+
+  fifth_size: { type: String },
+  fifth_size_pcs_wt: { type: String },
+  fifth_size_fab_wt: { type: String },
+
+  sixth_size: { type: String },
+  sixth_size_pcs_wt: { type: String },
+  sixth_size_fab_wt: { type: String },
+
+  seventh_size: { type: String },
+  seventh_size_pcs_wt: { type: String },
+  seventh_size_fab_wt: { type: String },
+
+  eighth_size: { type: String },
+  eighth_size_pcs_wt: { type: String },
+  eighth_size_fab_wt: { type: String },
+
+  ninth_size: { type: String },
+  ninth_size_pcs_wt: { type: String },
+  ninth_size_fab_wt: { type: String },
+
+  tenth_size: { type: String },
+  tenth_size_pcs_wt: { type: String },
+  tenth_size_fab_wt: { type: String },
+
+  eleventh_size: { type: String },
+  eleventh_size_pcs_wt: { type: String },
+  eleventh_size_fab_wt: { type: String },
+
+  twelfth_size: { type: String },
+  twelfth_size_pcs_wt: { type: String },
+  twelfth_size_fab_wt: { type: String }
+},
   DATE: {
   type: Date,
   default: Date.now,   

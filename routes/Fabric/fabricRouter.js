@@ -5,6 +5,7 @@ const fabric=express.Router()
 
 fabric.post('/inward',fabricController.Inward)
 fabric.get('/list',fabricController.List)
+fabric.get('/cuttinglist',fabricController.Cutting)
 fabric.post('/selection',fabricController.Selection)
 fabric.post('/outward',fabricController.Outward)
 fabric.post('/outward',fabricController.Cutting)

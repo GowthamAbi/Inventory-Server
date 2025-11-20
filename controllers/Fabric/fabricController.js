@@ -1,6 +1,7 @@
 import Fabric from "../../models/Fabric/Inward.js"
 import FabricBalance from "../../models/Fabric/Balance.js"
 import FabricOutward from "../../models/Fabric/Outward.js"
+import Counter from "../../models/Fabric/counter.model.js"
 
 const fabricController={
     Inward:async(req,res)=>{
@@ -12,7 +13,7 @@ const fabricController={
                 PRCESS_NAME,PROCESS_DC_NO,COMPACT_NO,RECD_DC_NO,RECD_DC_DATE,RECD_DC_ROLL,RECD_DC_WGT})
 
                 fabric.save().then(res.status(200).send("Data is Saved"))
-                console.log({fabric})
+                
         } catch (error) {
             console.log("inward error",error)
         }
@@ -24,7 +25,7 @@ const fabricController={
             const{FABRIC_GROUP,COLOR_NAME}=req.body
             console.log(FABRIC_GROUP,COLOR_NAME)
             const fabricBalance=await Fabric.find({FABRIC_GROUP,COLOR_NAME})
-            console.log(fabricBalance)
+            
                     if (!fabricBalance.length) {
                 return res.status(404).json({ message: "No matching data found" });
                 }
@@ -44,18 +45,32 @@ Outward: async (req, res) => {
       return res.status(400).json({ message: "items must be an array" });
     }
 
-    // Remove _id from each item
+    // Auto-assign increment order numbers
+    for (let i = 0; i < items.length; i++) {
+      const nextNo = await getNextOrderNo();
+      items[i].ORDER_NO = nextNo;
+    }
+
+    // Remove _id to avoid duplicate key errors
     const cleanedItems = items.map(({ _id, ...rest }) => rest);
 
     const savedDocs = await FabricOutward.insertMany(cleanedItems);
 
-    console.log("Inserted outward rows:", savedDocs);
+    return res.status(200).json(savedDocs);
 
-    res.status(200).json(savedDocs);
   } catch (error) {
     console.error("Error in Outward:", error);
     res.status(500).json({ message: "Server error", error });
   }
+},
+ getNextOrderNo:async(req,res)=>{
+  const counter = await Counter.findOneAndUpdate(
+    { name: "order_no" },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+
+  return counter.seq;
 },
     Balance:async(req,res)=>{
         try {
@@ -66,7 +81,7 @@ Outward: async (req, res) => {
             let balance=await FabricBalance(newData)
             balance.save().then(res.status(200).send("Balance was Saved"))
   
-            console.log(fabricData)
+          
         } catch (error) {
                console.error("Error in Balance:", error);
                res.status(500).send({ message: "Server error", error });
@@ -76,7 +91,7 @@ Outward: async (req, res) => {
         try {
             const fabricData=await Fabric.find()
             res.status(200).json(fabricData)
-            console.log("Fabric Data",fabricData)
+            
         } catch (error) {
             console.log("Error in List",error)
         }
@@ -85,7 +100,7 @@ Outward: async (req, res) => {
         try {
             const fabricData=await FabricOutward.find()
             res.status(200).json(fabricData)
-            console.log("FabricOutward Data",fabricData)
+           
         } catch (error) {
             console.log("Error in List",error)
         }
@@ -93,8 +108,6 @@ Outward: async (req, res) => {
 Fabric: async (req, res) => {
   try {
     const { DOC_NO } = req.body;     // Read DOC_NO from request body
-
-    console.log("Incoming DOC_NO:", DOC_NO);
 
     // Query DB: find any documents where DOC_NO matches
     const fabricData = await Fabric.find({ DOC_NO: DOC_NO });
@@ -112,7 +125,7 @@ Fabric: async (req, res) => {
             const{DOC_NO}=req.body
             const fabricData=await FabricOutward.find({ DOC_NO: DOC_NO })
             res.status(200).json(fabricData)
-            console.log("FabricOutward Data",fabricData)
+
         } catch (error) {
             console.log("Error in List",error)
         }
