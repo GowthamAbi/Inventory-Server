@@ -1,4 +1,4 @@
-import Fabric from "../../models/Fabric/Inward.js";
+import Inward from "../../models/Fabric/Inward.js";
 import FabricBalance from "../../models/Fabric/Balance.js";
 import FabricOutward from "../../models/Fabric/Outward.js";
 import Counter from "../../models/Fabric/counter.model.js";
@@ -21,33 +21,96 @@ async function getNextOrderNo() {
 // ----------------------------------------------------
 const fabricController = {
 
-  Inward: async (req, res) => {
+   Inward:async (req, res) => {
     try {
       const {
-        DOC_NO, DATE, JOB_ORDER_NO, RECORD_TYPE, FABRIC_GROUP, COLOR_NAME,
-        SET_NO, DC_DIA, DIA_TYPE, PRCESS_NAME, PROCESS_DC_NO,
-        COMPACT_NO, RECD_DC_NO, RECD_DC_DATE, RECD_DC_ROLL, RECD_DC_WGT
+        PRCESS_NAME,
+        PROCESS_DC_NO,
+        COMPACT_NAME,
+        COMPACT_NO,
+        FABRIC_GROUP,
+        COLOR_NAME,
+        SET_NO,
+        RECORD_TYPE,
+        JOB_ORDER_NO,
+
+        // single fields after popup
+        S_NO,
+        DIA_TYPE,
+        D_DIA,
+        D_ROLL,
+        D_WGT,
+        RECD_DC_ROLL,
+        RECD_DC_WGT,
+        DF_WGT,
+        DF_PERCE,
+        SAM_ROLL_1,
+        SAM_WGT1,
+        SAM_ROLL_2,
+        SAM_WGT2,
+        SAM_ROLL_3,
+        SAM_WGT3,
+
+        // DC_DIA popup → array of rows
+        dc_dia,
       } = req.body;
 
-      const fabric = new Fabric({
-        DOC_NO, DATE, JOB_ORDER_NO, RECORD_TYPE, FABRIC_GROUP, COLOR_NAME, SET_NO,
-        DC_DIA, DIA_TYPE, PRCESS_NAME, PROCESS_DC_NO, COMPACT_NO,
-        RECD_DC_NO, RECD_DC_DATE, RECD_DC_ROLL, RECD_DC_WGT
+      // Validation Example (optional)
+      if (!PRCESS_NAME || !PROCESS_DC_NO) {
+        return res.status(400).json({
+          message: "Required fields missing (PRCESS_NAME, PROCESS_DC_NO)",
+        });
+      }
+
+      const inwardData = new Inward({
+        PRCESS_NAME,
+        PROCESS_DC_NO,
+        COMPACT_NAME,
+        COMPACT_NO,
+        FABRIC_GROUP,
+        COLOR_NAME,
+        SET_NO,
+        RECORD_TYPE,
+        JOB_ORDER_NO,
+
+        S_NO,
+        DIA_TYPE,
+        D_DIA,
+        D_ROLL,
+        D_WGT,
+        RECD_DC_ROLL,
+        RECD_DC_WGT,
+        DF_WGT,
+        DF_PERCE,
+        SAM_ROLL_1,
+        SAM_WGT1,
+        SAM_ROLL_2,
+        SAM_WGT2,
+        SAM_ROLL_3,
+        SAM_WGT3,
+
+        dc_dia, // ⬅️ 10 rows stored cleanly
       });
 
-      await fabric.save();
-      return res.status(200).send("Data is Saved");
+      await inwardData.save();
 
+      return res.status(200).json({
+        message: "Inward Saved Successfully",
+        data: inwardData,
+      });
     } catch (error) {
       console.log("Inward error:", error);
-      return res.status(500).send("Server error");
+      return res.status(500).json({
+        message: "Server error while saving Inward",
+        error: error.message,
+      });
     }
   },
 
   Selection: async (req, res) => {
     try {
       const { FABRIC_GROUP, COLOR_NAME } = req.body;
-      const fabricBalance = await Fabric.find({ FABRIC_GROUP, COLOR_NAME });
+      const fabricBalance = await Inward.find({ FABRIC_GROUP, COLOR_NAME });
 
       if (!fabricBalance.length) {
         return res.status(404).json({ message: "No matching data found" });
@@ -90,7 +153,7 @@ const fabricController = {
 
   Balance: async (req, res) => {
     try {
-      const fabricData = await Fabric.findOne();
+      const fabricData = await Inward.findOne();
       let newData = fabricData.toObject();
 
       delete newData._id;
@@ -108,7 +171,7 @@ const fabricController = {
 
   List: async (req, res) => {
     try {
-      const fabricData = await Fabric.find();
+      const fabricData = await Inward.find();
       return res.status(200).json(fabricData);
 
     } catch (error) {
@@ -129,7 +192,7 @@ const fabricController = {
   Fabric: async (req, res) => {
     try {
       const { ORDER_NO } = req.body;
-      const fabricData = await Fabric.find({ ORDER_NO });
+      const fabricData = await Inward.find({ ORDER_NO });
 
       return res.status(200).json(fabricData);
 

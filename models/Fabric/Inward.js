@@ -1,87 +1,69 @@
 import mongoose from "mongoose";
 
-const fabricSchema=new mongoose.Schema({
-    DOC_NO:{
-            type:String,
-            required:true,
-            trim:true
-    },
-    DATE: {
-  type: Date,
-  default: Date.now,   
-},
-    JOB_ORDER_NO:{
-            type:String,
-            required:true,
-            trim:true
-    },
-    RECORD_TYPE:{
-            type:String,
-            required:true,
-            trim:true
-    },
-    FABRIC_GROUP:{
-            type:String,
-            required:true,
-            trim:true
-    },
-    COLOR_NAME:{
-            type:String,
-            required:true,
-            trim:true
-    },
-    SET_NO:{
-            type:String,
-            required:true,
-            trim:true
-    },
-    DC_DIA:{
-            type:String,
-            required:true,
-            trim:true
-    },
-    DIA_TYPE:{
-            type:String,
-            required:true,
-            trim:true
-    },
-  PRCESS_NAME:{
-            type:String,
-            required:true,
-            trim:true
-    },
-  PROCESS_DC_NO:{
-            type:String,
-            required:true,
-            trim:true
-    },
-  COMPACT_NO:{
-            type:String,
-            required:true,
-            trim:true
-    },
-  RECD_DC_NO:{
-            type:String,
-            required:true,
-            trim:true
-    },
-  RECD_DC_DATE:{
-            type:String,
-            required:true,
-            trim:true
-    },
-  RECD_DC_ROLL:{
-            type:String,
-            required:true,
-            trim:true
-    },
-  RECD_DC_WGT:{
-            type:String,
-            required:true,
-            trim:true
-    }
-})
+const dcDiaSchema = new mongoose.Schema({
+  dia_type: String,
 
-const Fabric=mongoose.model('fabric',fabricSchema)
+  d_dia: Number,
+  d_roll: Number,
+  d_wgt: Number,
+
+  r_dia: Number,
+  r_roll: Number,
+  r_wgt: Number,
+
+  df_wgt: Number,
+  d_prec: Number,
+
+  s_roll: Number,
+  s_wgt: Number,
+
+  s_roll2: Number,
+  s_wgt2: Number,
+
+  s_roll3: Number,
+  s_wgt3: Number,
+
+  s_roll4: Number,
+  s_wgt4: Number,
+});
+
+const inwardSchema = new mongoose.Schema(
+  {
+    // FIRST 9 INPUT FIELDS
+    PRCESS_NAME: String,
+    PROCESS_DC_NO: String,
+    COMPACT_NAME: String,
+    COMPACT_NO: String,
+    FABRIC_GROUP: String,
+    COLOR_NAME: String,
+    SET_NO: String,
+    RECORD_TYPE: String,
+    JOB_ORDER_NO: String,
+
+    // DC_DIA (popup table)
+    dc_dia: [dcDiaSchema], // 💡 10 rows stored as an array
+
+    // Remaining single fields after index 10
+    S_NO: String,
+    DIA_TYPE: String,
+    D_DIA: String,
+    D_ROLL: String,
+    D_WGT: String,
+    RECD_DC_ROLL: String,
+    RECD_DC_WGT: String,
+    DF_WGT: String,
+    DF_PERCE: String,
+    SAM_ROLL_1: String,
+    SAM_WGT1: String,
+    SAM_ROLL_2: String,
+    SAM_WGT2: String,
+    SAM_ROLL_3: String,
+    SAM_WGT3: String,
+  },
+  { timestamps: true }
+);
+
+
+const Fabric= mongoose.model("Inward", inwardSchema);
 
 export default Fabric
