@@ -21,91 +21,122 @@ async function getNextOrderNo() {
 // ----------------------------------------------------
 const fabricController = {
 
-   Inward:async (req, res) => {
-    try {
-      const {
-        PRCESS_NAME,
-        PROCESS_DC_NO,
-        COMPACT_NAME,
-        COMPACT_NO,
-        FABRIC_GROUP,
-        COLOR_NAME,
-        SET_NO,
-        RECORD_TYPE,
-        JOB_ORDER_NO,
+   Inward: async (req, res) => {
+  try {
+    const {
+      PRCESS_NAME,
+      PROCESS_DC_NO,
+      COMPACT_NAME,
+      COMPACT_NO,
+      FABRIC_GROUP,
+      COLOR_NAME,
+      SET_NO,
+      RECORD_TYPE,
+      JOB_ORDER_NO,
 
-        // single fields after popup
-        S_NO,
-        DIA_TYPE,
-        D_DIA,
-        D_ROLL,
-        D_WGT,
-        RECD_DC_ROLL,
-        RECD_DC_WGT,
-        DF_WGT,
-        DF_PERCE,
-        SAM_ROLL_1,
-        SAM_WGT1,
-        SAM_ROLL_2,
-        SAM_WGT2,
-        SAM_ROLL_3,
-        SAM_WGT3,
+      S_NO,
+      DIA_TYPE,
+      D_DIA,
+      D_ROLL,
+      D_WGT,
+      RECD_DC_ROLL,
+      RECD_DC_WGT,
+      DF_WGT,
+      DF_PERCE,
+      SAM_ROLL_1,
+      SAM_WGT1,
+      SAM_ROLL_2,
+      SAM_WGT2,
+      SAM_ROLL_3,
+      SAM_WGT3,
 
-        // DC_DIA popup → array of rows
-        dc_dia,
-      } = req.body;
+      dc_dia, // popup array
+    } = req.body;
 
-      // Validation Example (optional)
-      if (!PRCESS_NAME || !PROCESS_DC_NO) {
-        return res.status(400).json({
-          message: "Required fields missing (PRCESS_NAME, PROCESS_DC_NO)",
-        });
-      }
-
-      const inwardData = new Inward({
-        PRCESS_NAME,
-        PROCESS_DC_NO,
-        COMPACT_NAME,
-        COMPACT_NO,
-        FABRIC_GROUP,
-        COLOR_NAME,
-        SET_NO,
-        RECORD_TYPE,
-        JOB_ORDER_NO,
-
-        S_NO,
-        DIA_TYPE,
-        D_DIA,
-        D_ROLL,
-        D_WGT,
-        RECD_DC_ROLL,
-        RECD_DC_WGT,
-        DF_WGT,
-        DF_PERCE,
-        SAM_ROLL_1,
-        SAM_WGT1,
-        SAM_ROLL_2,
-        SAM_WGT2,
-        SAM_ROLL_3,
-        SAM_WGT3,
-
-        dc_dia, // ⬅️ 10 rows stored cleanly
-      });
-
-      await inwardData.save();
-
-      return res.status(200).json({
-        message: "Inward Saved Successfully",
-        data: inwardData,
-      });
-    } catch (error) {
-      console.log("Inward error:", error);
-      return res.status(500).json({
-        message: "Server error while saving Inward",
-        error: error.message,
+    // ✔️ Basic validation
+    if (!PRCESS_NAME || !PROCESS_DC_NO) {
+      return res.status(400).json({
+        message: "Required fields missing (PRCESS_NAME, PROCESS_DC_NO)",
       });
     }
-  },
+
+    // 1️⃣ CLEAN dc_dia rows (remove null, "", 0)
+    const cleanDcDia = Array.isArray(dc_dia)
+      ? dc_dia
+          .map((row) => {
+            const cleaned = {};
+            Object.entries(row).forEach(([key, value]) => {
+              if (
+                value !== null &&
+                value !== "" &&
+                value !== 0 &&
+                value !== undefined
+              ) {
+                cleaned[key] = value;
+              }
+            });
+            return cleaned;
+          })
+          .filter((row) => Object.keys(row).length > 0)
+      : [];
+
+    // 2️⃣ CREATE CLEAN DATA OBJECT (remove null/empty from single fields)
+    const cleanedFields = {};
+
+    const allFields = {
+      PRCESS_NAME,
+      PROCESS_DC_NO,
+      COMPACT_NAME,
+      COMPACT_NO,
+      FABRIC_GROUP,
+      COLOR_NAME,
+      SET_NO,
+      RECORD_TYPE,
+      JOB_ORDER_NO,
+
+      S_NO,
+      DIA_TYPE,
+      D_DIA,
+      D_ROLL,
+      D_WGT,
+      RECD_DC_ROLL,
+      RECD_DC_WGT,
+      DF_WGT,
+      DF_PERCE,
+      SAM_ROLL_1,
+      SAM_WGT1,
+      SAM_ROLL_2,
+      SAM_WGT2,
+      SAM_ROLL_3,
+      SAM_WGT3,
+    };
+
+    Object.entries(allFields).forEach(([key, value]) => {
+      if (value !== null && value !== "" && value !== 0) {
+        cleanedFields[key] = value;
+      }
+    });
+
+    // 3️⃣ ADD CLEAN dc_dia
+    cleanedFields.dc_dia = cleanDcDia;
+
+    // 4️⃣ SAVE
+    const inwardData = new Inward(cleanedFields);
+    await inwardData.save();
+
+    return res.status(200).json({
+      message: "Inward Saved Successfully",
+      data: inwardData,
+    });
+  } catch (error) {
+    console.log("Inward error:", error);
+    return res.status(500).json({
+      message: "Server error while saving Inward",
+      error: error.message,
+    });
+  }
+},
+
 
   Selection: async (req, res) => {
     try {
@@ -191,9 +222,10 @@ const fabricController = {
 
   Fabric: async (req, res) => {
     try {
-      const { ORDER_NO } = req.body;
-      const fabricData = await Inward.find({ ORDER_NO });
-
+      const { JOB_ORDER_NO } = req.body;
+      
+      const fabricData = await Inward.find({ JOB_ORDER_NO });
+      
       return res.status(200).json(fabricData);
 
     } catch (error) {
