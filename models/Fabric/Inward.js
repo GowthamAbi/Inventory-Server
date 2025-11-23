@@ -30,7 +30,7 @@ const dcDiaSchema = new mongoose.Schema({
 const inwardSchema = new mongoose.Schema(
   {
     // FIRST 9 INPUT FIELDS
-    PRCESS_NAME: String,
+    PROCESS_NAME: String,
     PROCESS_DC_NO: String,
     COMPACT_NAME: String,
     COMPACT_NO: String,

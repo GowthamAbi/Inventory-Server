@@ -11,6 +11,7 @@ fabric.post('/outward',fabricController.Outward)
 fabric.post('/outward',fabricController.Cutting)
 fabric.post('/print/1',fabricController.Fabric)
 fabric.post('/print/2',fabricController.CuttingList)
+fabric.get('/reports',fabricController.Balance)
 
 
 export default fabric
