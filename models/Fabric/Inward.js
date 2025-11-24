@@ -25,11 +25,14 @@ const dcDiaSchema = new mongoose.Schema({
 
   s_roll4: Number,
   s_wgt4: Number,
+
+  t_roll: Number,
+  t_wgt: Number,
 });
 
 const inwardSchema = new mongoose.Schema(
   {
-    // FIRST 9 INPUT FIELDS
+    
     PROCESS_NAME: String,
     PROCESS_DC_NO: String,
     COMPACT_NAME: String,
@@ -41,9 +44,9 @@ const inwardSchema = new mongoose.Schema(
     JOB_ORDER_NO: String,
 
     // DC_DIA (popup table)
-    dc_dia: [dcDiaSchema], // 💡 10 rows stored as an array
+    dc_dia: [dcDiaSchema],
 
-    // Remaining single fields after index 10
+  
     S_NO: String,
     DIA_TYPE: String,
     D_DIA: String,
@@ -59,6 +62,8 @@ const inwardSchema = new mongoose.Schema(
     SAM_WGT2: String,
     SAM_ROLL_3: String,
     SAM_WGT3: String,
+    TOTAL_ROLL: String, 
+    TOTAL_WEIGHT: String   
   },
   { timestamps: true }
 );

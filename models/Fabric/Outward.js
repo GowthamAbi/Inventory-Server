@@ -16,6 +16,22 @@ const fabricOutSchema = new mongoose.Schema({
   twelfth_dcno: { type: String, trim: true },
   thirteenth_dcno: { type: String, trim: true }
  },
+
+  BATCH_NO: {   
+  first_batchno: { type: String, trim: true },
+  second_batchno: { type: String, trim: true },
+  third_batchno: { type: String, trim: true },
+  fourth_batchno: { type: String, trim: true },
+  fifth_batchno: { type: String, trim: true },
+  sixth_batchno: { type: String, trim: true },
+  seventh_batchno: { type: String, trim: true },
+  eighth_batchno: { type: String, trim: true },
+  ninth_batchno: { type: String, trim: true },
+  tenth_batchno: { type: String, trim: true },
+  eleventh_batchno: { type: String, trim: true },
+  twelfth_batchno: { type: String, trim: true },
+  thirteenth_batchno: { type: String, trim: true }
+ },
   DATE: { type: Date,  trim: true },
   FABRIC_GROUP: { type: String,  trim: true },
   COLOR_NAME: {
