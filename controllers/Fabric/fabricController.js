@@ -339,8 +339,12 @@ const fabricController = {
         SAM_ROLL_3,
         SAM_WGT3,
 
+
         dc_dia,
       } = req.body;
+
+   
+
 
       if (!PROCESS_NAME || !PROCESS_DC_NO) {
         return res.status(400).json({ message: "Required fields missing" });
@@ -350,9 +354,23 @@ const fabricController = {
       const cleanDcDia = Array.isArray(dc_dia)
         ? dc_dia.filter((x) => Object.values(x || {}).some((v) => v !== null && v !== "" && v !== 0))
         : [];
+          let balanceEntry={}
 
+           for (const row of cleanDcDia) {
+         balanceEntry = {
+          FABRIC_GROUP,
+          COLOR_NAME,
+          SET_NO,
+          JOB_ORDER_NO,
+          DIA_TYPE: row.dia_type,
+          D_DIA: row.d_dia,
+          TOTAL_ROLL: row.t_roll,
+          TOTAL_WEIGHT: row.t_wgt,
+          BATCH_NO: row.batch_no,
+        };}
       // CLEAN MAIN FIELDS
       const cleanedFields = {};
+      
       const allFields = {
         PROCESS_NAME,
         PROCESS_DC_NO,
@@ -386,16 +404,21 @@ const fabricController = {
         }
       });
 
+         const filtered = Object.fromEntries(
+    Object.entries(balanceEntry).filter(([, v]) => v !== "" && v !== null && v !== undefined)
+  );
+
       cleanedFields.dc_dia = cleanDcDia;
+
 
       // SAVE INWARD ENTRY
       const inwardData = new Inward(cleanedFields);
       await inwardData.save();
 
-      // (Optional) you were also saving similar data in FabricBalance here.
-      // Usually: better to compute balance in Balance API by merging Inward + Outward,
-      // so we don't create a separate FabricBalance row on every inward.
-      // If you want to keep your old logic, you can add it back here.
+
+   
+      const balance=new FabricBalance(filtered)
+      await balance.save()
 
       return res.status(200).json({
         message: "Inward Saved Successfully",
@@ -423,7 +446,7 @@ const fabricController = {
       FABRIC_GROUP: FABRIC_GROUP,
       COLOR_NAME: COLOR_NAME
     }).lean();
-
+console.log(data)
     if (data.length === 0) {
       return res.status(404).json({
         message: "No matching balance found",
