@@ -276,7 +276,10 @@ for (const item of cleanedItems) {
   // Based on JOB_ORDER_NO, FABRIC_GROUP, COLOR, DIA
   Balance: async (req, res) => {
     try{
-
+      console.log("Enter Balnces")
+        const data=await FabricBalance.find()
+        console.log(data)
+        res.status(200).json(data)
     } catch (error) {
       console.error("Error in Balance:", error);
       return res.status(500).json({ message: "Server error", error });
