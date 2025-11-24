@@ -131,8 +131,6 @@ const fabricController = {
   );
 
       cleanedFields.dc_dia = cleanDcDia;
-console.log(allFields)
-console.log(cleanedFields)
 
       // SAVE INWARD ENTRY
       const inwardData = new Inward(cleanedFields);
@@ -169,7 +167,7 @@ console.log(cleanedFields)
       FABRIC_GROUP: FABRIC_GROUP,
       COLOR_NAME: COLOR_NAME
     }).lean();
-console.log(data)
+
     if (data.length === 0) {
       return res.status(404).json({
         message: "No matching balance found",
@@ -194,7 +192,7 @@ console.log(data)
   Outward: async (req, res) => {
     try {
       const { items } = req.body;
-console.log(items)
+      console.log(items)
      
       if (!Array.isArray(items)) {
         return res.status(400).json({ message: "items must be an array" });
@@ -209,13 +207,63 @@ console.log(items)
         ORDER_NO: orderNo,
       }));
 
-
-
-
       const savedDocs = await FabricOutward.insertMany(cleanedItems);
+const labels = [
+  "first",
+  "second",
+  "third",
+  "fourth",
+  "fifth",
+  "sixth",
+  "seventh",
+  "eighth",
+  "ninth",
+  "tenth"
+];
 
-      // (Optional) After saving Outward, you might want to recalc balances:
-      // await fabricController.BalanceInternal();  // define as internal helper if you want auto-update
+for (const item of cleanedItems) {
+
+  for (const label of labels) {
+
+    const batchNo =
+      item.BATCH_NO?.[`${label}_batchno`] ||
+      (label === "first" ? item.BATCH_NO : null);
+
+    if (!batchNo) continue;
+
+    const outRoll =
+      Number(item.ROLL?.[`${label}_roll`]) ||
+      (label === "first" ? Number(item.ROLL) : 0);
+
+    const outWgt =
+      Number(item.WGT?.[`${label}_wgt`]) ||
+      (label === "first" ? Number(item.WGT) : 0);
+
+    if (!outRoll && !outWgt) continue;
+
+    const balance = await FabricBalance.findOne({ BATCH_NO: batchNo });
+    if (!balance) continue;
+
+    const oldRoll = Number(balance.TOTAL_ROLL) || 0;
+    const oldWgt  = Number(balance.TOTAL_WEIGHT) || 0;
+
+    const newRoll = oldRoll - outRoll;
+    const newWgt  = oldWgt - outWgt;
+
+    balance.TOTAL_ROLL = newRoll < 0 ? 0 : newRoll;
+    balance.TOTAL_WEIGHT = newWgt < 0 ? 0 : newWgt;
+
+    // AUTO DELETE WHEN ZERO
+    if (balance.TOTAL_ROLL <= 0 && balance.TOTAL_WEIGHT <= 0) {
+      await FabricBalance.deleteOne({ _id: balance._id });
+      continue;
+    }
+
+    await balance.save();
+  }
+}
+
+
 
       return res.status(200).json(savedDocs);
     } catch (error) {
@@ -227,124 +275,8 @@ console.log(items)
   // ---------------- BALANCE (Inward - Outward) ---------------- //
   // Based on JOB_ORDER_NO, FABRIC_GROUP, COLOR, DIA
   Balance: async (req, res) => {
-    try {
-      const inwardData = await Inward.find();
-      const outwardData = await FabricOutward.find();
+    try{
 
-      // Map keyed by JOB_ORDER_NO|FABRIC_GROUP|COLOR_NAME|DIA
-      const map = new Map();
-
-      // 1️⃣ Process INWARD
-      inwardData.forEach((inv) => {
-        const job = inv.JOB_ORDER_NO || "";
-        const fabricGroup = inv.FABRIC_GROUP || "";
-        const color = inv.COLOR_NAME || "";
-
-        // We'll use r_dia, r_roll, r_wgt from dc_dia rows as inward
-        (inv.dc_dia || []).forEach((row) => {
-          const dia = Number(row.r_dia || 0);
-          const key = `${job}|${fabricGroup}|${color}|${dia}`;
-
-          if (!map.has(key)) {
-            map.set(key, {
-              JOB_ORDER_NO: job,
-              FABRIC_GROUP: fabricGroup,
-              COLOR_NAME: color,
-              DIA: dia,
-              inwardRoll: 0,
-              inwardWgt: 0,
-              outwardRoll: 0,
-              outwardWgt: 0,
-            });
-          }
-
-          const rec = map.get(key);
-          rec.inwardRoll += Number(row.r_roll || 0);
-          rec.inwardWgt += Number(row.r_wgt || 0);
-        });
-      });
-
-      // 2️⃣ Process OUTWARD
-      outwardData.forEach((out) => {
-        const job = out.JOB_ORDER_NO || ""; // make sure Outward has JOB_ORDER_NO in schema & data
-        const fabricGroup = out.FABRIC_GROUP || "";
-        const color = getOutwardColor(out); // COLOR_NAME.first_color
-        const dia = Number(out.DC_DIA || 0);
-        const key = `${job}|${fabricGroup}|${color}|${dia}`;
-
-        if (!map.has(key)) {
-          map.set(key, {
-            JOB_ORDER_NO: job,
-            FABRIC_GROUP: fabricGroup,
-            COLOR_NAME: color,
-            DIA: dia,
-            inwardRoll: 0,
-            inwardWgt: 0,
-            outwardRoll: 0,
-            outwardWgt: 0,
-          });
-        }
-
-        const rec = map.get(key);
-
-        // Sum all roll & wgt in nested objects
-        rec.outwardRoll += sumNested(out.ROLL);
-        rec.outwardWgt += sumNested(out.WGT);
-      });
-
-      // 3️⃣ Build rows + save to FabricBalance
-      const rows = [];
-      const bulkOps = [];
-
-      for (const rec of map.values()) {
-        const balanceRoll = rec.inwardRoll - rec.outwardRoll;
-        const balanceWgt = rec.inwardWgt - rec.outwardWgt;
-
-        const row = {
-          JOB_ORDER_NO: rec.JOB_ORDER_NO,
-          FABRIC_GROUP: rec.FABRIC_GROUP,
-          COLOR_NAME: rec.COLOR_NAME,
-          DIA: rec.DIA,
-          inwardRoll: rec.inwardRoll,
-          inwardWgt: rec.inwardWgt,
-          outwardRoll: rec.outwardRoll,
-          outwardWgt: rec.outwardWgt,
-          balanceRoll,
-          balanceWgt,
-        };
-
-        rows.push(row);
-
-        // Upsert per job+group+color+dia
-        bulkOps.push({
-          updateOne: {
-            filter: {
-              JOB_ORDER_NO: rec.JOB_ORDER_NO,
-              FABRIC_GROUP: rec.FABRIC_GROUP,
-              COLOR_NAME: rec.COLOR_NAME,
-              DIA: rec.DIA,
-            },
-            update: { $set: row },
-            upsert: true,
-          },
-        });
-      }
-
-      if (bulkOps.length > 0) {
-        await FabricBalance.bulkWrite(bulkOps);
-      }
-
-      // 4️⃣ Totals (if you want summary)
-      const totalInward = rows.reduce((s, r) => s + r.inwardWgt, 0);
-      const totalOutward = rows.reduce((s, r) => s + r.outwardWgt, 0);
-      const balanceValue = totalInward - totalOutward;
-
-      return res.status(200).json({
-        totalInward,
-        totalOutward,
-        balance: balanceValue,
-        rows,
-      });
     } catch (error) {
       console.error("Error in Balance:", error);
       return res.status(500).json({ message: "Server error", error });
