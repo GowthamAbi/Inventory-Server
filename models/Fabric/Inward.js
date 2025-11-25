@@ -7,7 +7,6 @@ const dcDiaSchema = new mongoose.Schema({
   d_roll: Number,
   d_wgt: Number,
 
-  r_dia: Number,
   r_roll: Number,
   r_wgt: Number,
 

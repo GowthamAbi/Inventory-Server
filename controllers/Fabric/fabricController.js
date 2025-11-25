@@ -3,16 +3,6 @@ import FabricBalance from "../../models/Fabric/Balance.js";
 import FabricOutward from "../../models/Fabric/Outward.js";
 import Counter from "../../models/Fabric/counter.model.js"
 
-// --------------------- Helpers --------------------- //
-function sumNested(obj) {
-  if (!obj || typeof obj !== "object") return 0;
-  return Object.values(obj).reduce((sum, v) => sum + (Number(v) || 0), 0);
-}
-
-function getOutwardColor(out) {
-  if (!out.COLOR_NAME || typeof out.COLOR_NAME !== "object") return "";
-  return out.COLOR_NAME.first_color || "";
-}
 
 // To generate ORDER_NO
 async function getNextOrderNo() {
