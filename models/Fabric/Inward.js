@@ -27,6 +27,7 @@ const dcDiaSchema = new mongoose.Schema({
 
   t_roll: Number,
   t_wgt: Number,
+  batch_no:String
 });
 
 const inwardSchema = new mongoose.Schema(
@@ -62,7 +63,8 @@ const inwardSchema = new mongoose.Schema(
     SAM_ROLL_3: String,
     SAM_WGT3: String,
     TOTAL_ROLL: String, 
-    TOTAL_WEIGHT: String   
+    TOTAL_WEIGHT: String,
+    BATCH_NO: String,   
   },
   { timestamps: true }
 );

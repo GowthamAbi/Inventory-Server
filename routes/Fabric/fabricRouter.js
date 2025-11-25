@@ -4,6 +4,7 @@ import fabricController from '../../controllers/Fabric/fabricController.js'
 const fabric=express.Router()
 
 fabric.post('/inward',fabricController.Inward)
+fabric.get('/inward',fabricController.Inward)
 fabric.get('/list',fabricController.List)
 fabric.get('/cuttinglist',fabricController.Cutting)
 fabric.post('/selection',fabricController.Selection)

@@ -49,14 +49,20 @@ const fabricController = {
         SAM_WGT3,
         TOTAL_ROLL,
         TOTAL_WEIGHT,
+        BATCH_NO,
 
         dc_dia,
       } = req.body;
 
    
+        const already=await Inward.findOne({JOB_ORDER_NO})
 
+        if(already){
+          
+          return res.status(200).json(already)
+        }
 
-      if (!PROCESS_NAME || !PROCESS_DC_NO) {
+    if (!PROCESS_NAME || !PROCESS_DC_NO) {
         return res.status(400).json({ message: "Required fields missing" });
       }
 
@@ -108,6 +114,7 @@ const fabricController = {
         SAM_WGT3,
         TOTAL_ROLL,
         TOTAL_WEIGHT,
+        BATCH_NO
       };
 
       Object.entries(allFields).forEach(([k, v]) => {
