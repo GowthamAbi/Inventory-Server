@@ -55,12 +55,6 @@ const fabricController = {
       } = req.body;
 
    
-        const already=await Inward.findOne({JOB_ORDER_NO})
-
-        if(already){
-          
-          return res.status(200).json(already)
-        }
 
     if (!PROCESS_NAME || !PROCESS_DC_NO) {
         return res.status(400).json({ message: "Required fields missing" });
