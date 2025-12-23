@@ -183,7 +183,7 @@ const fabricController = {
   Outward: async (req, res) => {
     try {
       const { items } = req.body;
-      console.log(items)
+     
      
       if (!Array.isArray(items)) {
         return res.status(400).json({ message: "items must be an array" });
@@ -269,7 +269,7 @@ for (const item of cleanedItems) {
     try{
       console.log("Enter Balnces")
         const data=await FabricBalance.find()
-        console.log(data)
+      
         res.status(200).json(data)
     } catch (error) {
       console.error("Error in Balance:", error);
